@@ -56,7 +56,7 @@ func parseArgs(args []string) (config, error) {
 
 // 사용자 이름을 입력받는 함수
 func getName(r io.Reader, w io.Writer) (string, error) {
-	msg := "Your name? Press the Enter key when done \n"
+	msg := "Your name please? Press the Enter key when done.\n"
 	fmt.Fprintf(w, msg)
 	scanner := bufio.NewScanner(r)
 	scanner.Scan()
