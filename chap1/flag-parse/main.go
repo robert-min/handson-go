@@ -11,7 +11,10 @@ import (
 
 type config struct {
 	numTimes int
+	name     string
 }
+
+var errInvalidPosArgSpecified = errors.New("More than one positional argument specified")
 
 func getName(r io.Reader, w io.Writer) (string, error) {
 	scanner := bufio.NewScanner(r)
@@ -29,19 +32,25 @@ func getName(r io.Reader, w io.Writer) (string, error) {
 	return name, nil
 }
 
-func greetUser(c config, name string, w io.Writer) {
-	msg := fmt.Sprintf("Nice to meet you %s\n", name)
+func greetUser(c config, w io.Writer) {
+	msg := fmt.Sprintf("Nice to meet you %s\n", c.name)
 	for i := 0; i < c.numTimes; i++ {
 		fmt.Fprintf(w, msg)
 	}
 }
 
-func runCmd(r io.Reader, w io.Writer, c config) error {
-	name, err := getName(r, w)
-	if err != nil {
-		return err
+func runCmd(rd io.Reader, w io.Writer, c config) error {
+	var err error
+	// Enter if name is not specified or blank
+	if len(c.name) == 0 {
+		c.name, err = getName(rd, w)
+		if err != nil {
+			return err
+		}
+		greetUser(c, w)
+		return nil
 	}
-	greetUser(c, name, w)
+	greetUser(c, w)
 	return nil
 }
 
@@ -60,14 +69,30 @@ func parseArgs(w io.Writer, args []string) (config, error) {
 	fs := flag.NewFlagSet("greater", flag.ContinueOnError)
 	fs.SetOutput(w)
 
+	// set help message
+	fs.Usage = func() {
+		var usageString = `
+A greeter application which prints the name you entered a specified number of times.
+
+Usage of %s: <options> [name]`
+		fmt.Fprintf(w, usageString, fs.Name())
+		fmt.Fprintln(w)
+		fmt.Fprintln(w)
+		fmt.Fprintln(w, "Options: ")
+		fs.PrintDefaults()
+	}
+
 	// set flag options
 	fs.IntVar(&c.numTimes, "n", 0, "Number of times to great")
 	err := fs.Parse(args)
 	if err != nil {
 		return c, err
 	}
-	if fs.NArg() != 0 {
-		return c, errors.New("Positional arguments specified")
+	if fs.NArg() > 1 {
+		return c, errInvalidPosArgSpecified
+	}
+	if fs.NArg() == 1 {
+		c.name = fs.Arg(0)
 	}
 	return c, nil
 }
@@ -75,7 +100,9 @@ func parseArgs(w io.Writer, args []string) (config, error) {
 func main() {
 	c, err := parseArgs(os.Stderr, os.Args[1:])
 	if err != nil {
-		fmt.Fprintln(os.Stdout, err)
+		if errors.Is(err, errInvalidPosArgSpecified) {
+			fmt.Fprintln(os.Stdout, err)
+		}
 		os.Exit(1)
 	}
 	err = validateArgs(c)

@@ -8,13 +8,13 @@ import (
 )
 
 func TestRunCmd(t *testing.T) {
-
 	tests := []struct {
 		c      config
 		input  string
 		output string
 		err    error
 	}{
+
 		{
 			c:      config{numTimes: 5},
 			input:  "",
@@ -26,7 +26,13 @@ func TestRunCmd(t *testing.T) {
 			input:  "Bill Bryson",
 			output: "Your name please? Press the Enter key when done.\n" + strings.Repeat("Nice to meet you Bill Bryson\n", 5),
 		},
+		{
+			c:      config{numTimes: 5, name: "Bill Bryson"},
+			input:  "",
+			output: strings.Repeat("Nice to meet you Bill Bryson\n", 5),
+		},
 	}
+
 	byteBuf := new(bytes.Buffer)
 	for _, tc := range tests {
 		r := strings.NewReader(tc.input)
@@ -34,16 +40,13 @@ func TestRunCmd(t *testing.T) {
 		if err != nil && tc.err == nil {
 			t.Fatalf("Expected nil error, got: %v\n", err)
 		}
-		if tc.err != nil {
-			if err.Error() != tc.err.Error() {
-				t.Fatalf("Expected error: %v, Got error: %v\n", tc.err.Error(), err.Error())
-			}
+		if tc.err != nil && err.Error() != tc.err.Error() {
+			t.Fatalf("Expected error: %v, Got error: %v\n", tc.err.Error(), err.Error())
 		}
 		gotMsg := byteBuf.String()
 		if gotMsg != tc.output {
 			t.Errorf("Expected stdout message to be: %v, Got: %v\n", tc.output, gotMsg)
 		}
-
 		byteBuf.Reset()
 	}
 }
