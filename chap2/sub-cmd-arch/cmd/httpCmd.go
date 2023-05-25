@@ -20,9 +20,9 @@ func HandleHttp(w io.Writer, args []string) error {
 
 	fs.Usage = func() {
 		var usageString = `
-		http: A HTTP client.
-		
-		http: <options> server`
+http: A HTTP client.
+
+http: <options> server`
 		fmt.Fprintf(w, usageString)
 
 		fmt.Fprintln(w)

@@ -39,6 +39,10 @@ func handleCommand(w io.Writer, args []string) error {
 		}
 	}
 
+	if errors.Is(err, cmd.ErrNoServerSpecified) || errors.Is(err, errInvalidSubCommand) {
+		fmt.Fprintln(w, err)
+		printUsage(w)
+	}
 	return err
 
 }
