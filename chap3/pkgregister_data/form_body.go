@@ -27,10 +27,12 @@ func createMultiPartMessage(data pkgData) ([]byte, string, error) {
 	}
 	fmt.Fprintf(fw, data.Version)
 
+	// Create binary fields and assign "fw"
 	fw, err = mw.CreateFormFile("filedata", data.Filename)
 	if err != nil {
 		return nil, "", err
 	}
+
 	_, err = io.Copy(fw, data.Bytes)
 	err = mw.Close()
 	if err != nil {

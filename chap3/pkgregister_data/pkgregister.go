@@ -21,8 +21,9 @@ type pkgRegisterResult struct {
 }
 
 func registerPackageData(url string, data pkgData) (pkgRegisterResult, error) {
-
 	p := pkgRegisterResult{}
+
+	// Create multipart/form-data payload
 	payload, contentType, err := createMultiPartMessage(data)
 	if err != nil {
 		return p, err

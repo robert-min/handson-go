@@ -35,6 +35,8 @@ func handleUserApi(w http.ResponseWriter, r *http.Request) {
 
 	client := &http.Client{}
 	log.Println("Outgoing HTTP request")
+
+	// Check context valid
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Printf("Error making request: %v\n", err)

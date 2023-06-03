@@ -24,9 +24,11 @@ func createHTTPGetRequestWithTrace(ctx context.Context, url string) (*http.Reque
 		return nil, err
 	}
 	trace := &httptrace.ClientTrace{
+		// DNS lookup for a specific hostname is completed
 		DNSDone: func(dnsInfo httptrace.DNSDoneInfo) {
 			fmt.Printf("DNS Info: %+v\n", dnsInfo)
 		},
+		// Already existing TCP connection from connection pooling
 		GotConn: func(connInfo httptrace.GotConnInfo) {
 			fmt.Printf("Got Conn: %+v\n", connInfo)
 		},
