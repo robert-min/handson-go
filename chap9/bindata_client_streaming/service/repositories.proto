@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+option go_package = "github.com/handson-go/chap9/bindata_client_streaming/service";
+
+service Repo {
+    rpc CreateRepo (stream RepoCreateRequest) returns (RepoCreateReply) {}
+}
+
+message RepoContext {
+    string create_id = 1;
+    string name = 2;
+}
+
+message RepoCreateRequest {
+    oneof body {
+        RepoContext context = 1;
+        bytes data = 2;
+    }
+}
+
+message Repository {
+    string id = 1;
+    string name = 2;
+    string url = 3;
+}
+
+message RepoCreateReply { 
+    Repository repo = 1;
+    int32 size = 2;
+}
